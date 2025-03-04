@@ -1,9 +1,9 @@
 import React, { useState, useRef } from "react";
-import uploadImage from '../assets/upload.jpg'
-import { X } from "lucide-react";
+import uploadImage from '../assets/upload.jpg';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-
-const FileUploadDropzone = ({ onClientUploadComplete, onUploadError, onUpload }) => {
+const FileUploadDropzone = ({ onUploadError, onUpload }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [file, setFile] = useState(null);
@@ -60,36 +60,61 @@ const FileUploadDropzone = ({ onClientUploadComplete, onUploadError, onUpload })
         body: formData,
       });
 
+      if (!response.ok) {
+        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+      }
+
       const data = await response.json();
       console.log("Uploaded to Cloudinary: ", data.fileDetails.fileUrl);
       onUpload(data.fileDetails.fileUrl);
-      setUploadedFileUrl(data.fileDetails.fileUrl)
+      setUploadedFileUrl(data.fileDetails.fileUrl);
 
       setIsUploading(false);
       setIsUploaded(true);
 
-
-      onClientUploadComplete([data]);
-
-      alert("File successfully uploaded to Cloudinary!");
+      toast.success("File successfully uploaded to Cloudinary!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     } catch (error) {
       console.error("Error uploading file: ", error);
-      onUploadError(error);
-      alert(`Error: ${error.message}`);
+      if (onUploadError) {
+        onUploadError(error);
+      } else {
+        toast.error(`Error: ${error.message}`, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
     } finally {
       setIsUploading(false);
     }
   };
 
+  const isImageFile = (file) => {
+    return file && file.type.startsWith("image/");
+  };
+
   return (
     <div
       style={{
-        border: "2px dashed #ccc",
+        border: `2px dashed ${isUploaded ? "#4CAF50" : "#ccc"}`,
         padding: "20px",
         textAlign: "center",
         borderRadius: "8px",
         backgroundColor: isDragging ? "#f0f0f0" : "#fff",
         cursor: "pointer",
+        transition: "border-color 0.3s ease",
       }}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -111,7 +136,6 @@ const FileUploadDropzone = ({ onClientUploadComplete, onUploadError, onUpload })
           />
           <p>Uploading...</p>
         </div>
-
       ) : (
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
           {!file ? (
@@ -126,11 +150,8 @@ const FileUploadDropzone = ({ onClientUploadComplete, onUploadError, onUpload })
                   objectFit: "cover",
                   borderRadius: "10px",
                 }}
-
               />
-
               <p>Drag and drop a file here, or click to select a file</p>
-              {/* Hidden file input, triggered by the div */}
               <input
                 type="file"
                 ref={fileInputRef}
@@ -141,7 +162,7 @@ const FileUploadDropzone = ({ onClientUploadComplete, onUploadError, onUpload })
           ) : (
             <>
               {isUploaded ? (
-               
+                isImageFile(file) ? (
                   <img
                     src={uploadedFileUrl}
                     alt="Upload"
@@ -152,11 +173,15 @@ const FileUploadDropzone = ({ onClientUploadComplete, onUploadError, onUpload })
                       objectFit: "cover",
                       borderRadius: "10px",
                     }}
-
                   />
-                  
-                
-
+                ) : (
+                  <div>
+                    <p>File uploaded: {file.name}</p>
+                    <a href={uploadedFileUrl} target="_blank" rel="noopener noreferrer">
+                      View File
+                    </a>
+                  </div>
+                )
               ) : (
                 <img
                   src={uploadImage}
@@ -168,33 +193,53 @@ const FileUploadDropzone = ({ onClientUploadComplete, onUploadError, onUpload })
                     objectFit: "cover",
                     borderRadius: "10px",
                   }}
-
                 />
               )}
 
-              <p>File selected: {file.name}</p>
+             
               <button
                 onClick={handleUpload}
                 disabled={isUploading || isUploaded}
                 style={{
                   marginTop: "10px",
                   padding: "10px",
-                  backgroundColor: "#4CAF50",
+                  backgroundColor: isUploaded ? "#4CAF50" : "#4CAF50",
                   color: "#fff",
                   border: "none",
                   borderRadius: "5px",
                   cursor: isUploading || isUploaded ? "not-allowed" : "pointer",
-                  filter: isUploaded ? "blur(0.5px)" : "none",
+                  opacity: isUploaded ? 0.7 : 1,
                 }}
               >
-                {isUploaded ? "Upload" : "Upload"}
+                {isUploaded ? "Uploaded ✅" : "Upload"}
               </button>
+
+              {isUploaded && (
+                <div style={{ color: "#4CAF50", fontWeight: "bold", marginTop: "10px" }}>
+                  File Uploaded Successfully!
+                </div>
+              )}
             </>
           )}
         </div>
       )}
     </div>
   );
+};
+
+FileUploadDropzone.defaultProps = {
+  onUploadError: (error) => {
+    console.error("Upload error:", error);
+    toast.error(`Error: ${error.message}`, {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  },
 };
 
 export default FileUploadDropzone;

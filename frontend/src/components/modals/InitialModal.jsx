@@ -14,6 +14,8 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { setCurrServer } from "@/redux/slices/serverSlice";
 
 const InitialModal = () => {
     const { user } = useUser();
@@ -24,6 +26,7 @@ const InitialModal = () => {
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate(); 
+    const dispatch = useDispatch();
     const currServerId = useSelector((state)=>(state.server.currServerId));
 
     useEffect(() => {
@@ -64,14 +67,17 @@ const InitialModal = () => {
             });
 
             const data = await response.json();
-            console.log("Server data created at supabase: ", data);
-           
+
+            dispatch(setCurrServer(data.server));
 
             setFormData({
                 name: "",
                 imageUrl: "",
             });
             navigate(`/server/${data.serverId}`);
+            setTimeout(() => {
+                window.location.reload(); 
+            }, 1); 
         } catch (error) {
             console.error("Error submitting form:", error);
         } finally {

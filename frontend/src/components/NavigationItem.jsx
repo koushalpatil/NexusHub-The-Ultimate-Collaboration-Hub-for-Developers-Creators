@@ -17,7 +17,7 @@ export const NavigationItem = ({ id, imageUrl, name }) => {
             label={name}
             
         >
-            <button onClick={onClick} className="group relative flex items-center w-[85px] h-[60px] bg-transparent">
+            <button  className="group relative flex items-center w-[85px] h-[60px] bg-transparent">
                 <div className={cn(
                     "absolute left-0 bg-primary rounded-r-full transition-all w-[4px]",
                     params?.serverId !== id && "group-hover:h-[20px]",

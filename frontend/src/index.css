@@ -8,6 +8,8 @@ html,:root,body {
   height: 100%;
 }
 
+
+
 :root {
   font-family: 'Open Sans', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -18,8 +20,11 @@ html,:root,body {
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+ 
   -moz-osx-font-smoothing: grayscale;
 }
+
+
 
 html body #root {
   padding: 0;
@@ -43,15 +48,32 @@ body {
   margin: 0;
   display: block;
   box-sizing: border-box; 
-  min-width: 320px;
-  min-height: 100vh;
+  min-width: 100vw !important;
+  min-height: 100vh !important;
   
 }
 
+#root
+{
+  min-width: 100vw !important;
+  min-height: 100vh !important;
+}
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+}
+
+.lk-room-container {
+  min-height: 95vh;
+  width: 100%; /* Full width */
+  display: grid;
+  grid-template-rows: 1fr; /* Single row taking up full height */
+}
+
+.lk-video-conference {
+  min-height: 70vh;
+  width: 100%; /* Full width */
 }
 
 button {
@@ -156,3 +178,15 @@ button:focus-visible {
     @apply bg-background text-foreground;
   }
 }
+
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+

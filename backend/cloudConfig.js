@@ -15,7 +15,8 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: "TechForge", 
-    allowed_formats: ["jpg", "jpeg", "png", "gif", "webp"], 
+    allowed_formats: ["jpg", "jpeg", "png", "gif", "webp","pdf"],
+    resource_type: "auto", 
   },
 });
 
